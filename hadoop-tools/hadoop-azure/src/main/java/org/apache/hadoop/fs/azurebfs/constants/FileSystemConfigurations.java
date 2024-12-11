@@ -40,7 +40,7 @@ public final class FileSystemConfigurations {
 
   // Retry parameter defaults.
   public static final int DEFAULT_MIN_BACKOFF_INTERVAL = 500;  // 500ms
-  public static final int DEFAULT_MAX_BACKOFF_INTERVAL = 25 * 1000;  // 25s
+  public static final int DEFAULT_MAX_BACKOFF_INTERVAL = 25_000;  // 25s
   public static final boolean DEFAULT_STATIC_RETRY_FOR_CONNECTION_TIMEOUT_ENABLED = true;
   public static final int DEFAULT_STATIC_RETRY_INTERVAL = 1_000; // 1s
   public static final int DEFAULT_BACKOFF_INTERVAL = 500;  // 500ms

@@ -97,13 +97,21 @@ public class ITestExponentialRetryPolicy extends AbstractAbfsIntegrationTest {
   }
 
   @Test
-  public void testDefaultClientSideThrottling() throws Exception {
+  public void testClientSideThrottlingConfigs() throws Exception {
     final Configuration configuration = new Configuration();
+    configuration.setBoolean(FS_AZURE_ENABLE_AUTOTHROTTLING, true);
     AbfsConfiguration abfsConfiguration = new AbfsConfiguration(configuration,
             DUMMY_ACCOUNT_NAME);
-    Assume.assumeTrue(configuration.get(FS_AZURE_ENABLE_AUTOTHROTTLING) == null);
-    Assertions.assertThat(abfsConfiguration.isAutoThrottlingEnabled())
-            .describedAs("Client-side throttling should be disabled by default").isFalse();
+   Assertions.assertThat(abfsConfiguration.isAutoThrottlingEnabled())
+            .describedAs("Client-side throttling enabled by configuration key")
+            .isTrue();
+
+    configuration.unset(FS_AZURE_ENABLE_AUTOTHROTTLING);
+    AbfsConfiguration abfsConfiguration2 = new AbfsConfiguration(configuration,
+            DUMMY_ACCOUNT_NAME);
+    Assertions.assertThat(abfsConfiguration2.isAutoThrottlingEnabled())
+            .describedAs("Client-side throttling should be disabled by default")
+            .isFalse();
   }
 
   @Test
