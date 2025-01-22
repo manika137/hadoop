@@ -39,7 +39,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
 import org.apache.hadoop.fs.azurebfs.AbfsConfiguration;
+import org.apache.hadoop.fs.FileAlreadyExistsException;
 import org.apache.hadoop.fs.azurebfs.AzureBlobFileSystemStore;
 import org.apache.hadoop.fs.azurebfs.constants.AbfsHttpConstants;
 import org.apache.hadoop.fs.azurebfs.constants.AbfsHttpConstants.ApiVersion;
@@ -127,6 +129,7 @@ import static org.apache.hadoop.fs.azurebfs.constants.HttpQueryParams.QUERY_PARA
 import static org.apache.hadoop.fs.azurebfs.constants.HttpQueryParams.QUERY_PARAM_RETAIN_UNCOMMITTED_DATA;
 import static org.apache.hadoop.fs.azurebfs.contracts.services.AzureServiceErrorCode.RENAME_DESTINATION_PARENT_PATH_NOT_FOUND;
 import static org.apache.hadoop.fs.azurebfs.contracts.services.AzureServiceErrorCode.SOURCE_PATH_NOT_FOUND;
+import static org.apache.hadoop.fs.azurebfs.contracts.services.AzureServiceErrorCode.UNAUTHORIZED_BLOB_OVERWRITE;
 
 /**
  * AbfsClient interacting with the DFS Endpoint.
@@ -611,6 +614,11 @@ public class AbfsDfsClient extends AbfsClient {
       // If we have no HTTP response, throw the original exception.
       if (!op.hasResult()) {
         throw e;
+      }
+
+      if(op.getResult().getStorageErrorCode()
+          .equals(UNAUTHORIZED_BLOB_OVERWRITE.getErrorCode())){
+        throw new FileAlreadyExistsException("File already exists." );
       }
 
       // ref: HADOOP-18242. Rename failure occurring due to a rare case of
