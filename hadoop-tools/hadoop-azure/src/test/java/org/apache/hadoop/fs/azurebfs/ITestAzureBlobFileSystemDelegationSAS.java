@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileAlreadyExistsException;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -210,6 +211,23 @@ public class ITestAzureBlobFileSystemDelegationSAS extends AbstractAbfsIntegrati
       assertEquals(2 * expectedFileLength, bytesRead);
       String fileContent = new String(readBuffer, 0, bytesRead, StandardCharsets.UTF_8);
       assertEquals(msg2 + msg2 + msg1 + msg1, fileContent);
+    }
+  }
+
+  @Test
+  public void checkExceptionForRenameOverwrites() throws Exception {
+    final AzureBlobFileSystem fs = getFileSystem();
+
+    Path src = new Path("a/b/f1.txt");
+    Path dest = new Path("a/b/f2.txt");
+    touch(src);
+    touch(dest);
+
+    try {
+      fs.rename(src, dest);
+    } catch (FileAlreadyExistsException e) {
+      Assertions.assertThat(e)
+          .isInstanceOf(FileAlreadyExistsException.class);
     }
   }
 
