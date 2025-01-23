@@ -225,6 +225,7 @@ public class ITestAzureBlobFileSystemDelegationSAS extends AbstractAbfsIntegrati
 
     try {
       fs.rename(src, dest);
+      Assertions.fail("Exception expected on rename overwrites.");
     } catch (FileAlreadyExistsException e) {
       Assertions.assertThat(e)
           .isInstanceOf(FileAlreadyExistsException.class);

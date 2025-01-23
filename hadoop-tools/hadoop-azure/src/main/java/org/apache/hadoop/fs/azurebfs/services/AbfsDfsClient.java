@@ -617,7 +617,7 @@ public class AbfsDfsClient extends AbfsClient {
 
       if(op.getResult().getStorageErrorCode()
           .equals(UNAUTHORIZED_BLOB_OVERWRITE.getErrorCode())){
-        throw new FileAlreadyExistsException("File already exists or request not authorized for blob overwrites.");
+        throw new FileAlreadyExistsException("File already exists.");
       }
 
       // ref: HADOOP-18242. Rename failure occurring due to a rare case of
