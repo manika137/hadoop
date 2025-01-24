@@ -129,6 +129,7 @@ import static org.apache.hadoop.fs.azurebfs.constants.HttpQueryParams.QUERY_PARA
 import static org.apache.hadoop.fs.azurebfs.contracts.services.AzureServiceErrorCode.RENAME_DESTINATION_PARENT_PATH_NOT_FOUND;
 import static org.apache.hadoop.fs.azurebfs.contracts.services.AzureServiceErrorCode.SOURCE_PATH_NOT_FOUND;
 import static org.apache.hadoop.fs.azurebfs.contracts.services.AzureServiceErrorCode.UNAUTHORIZED_BLOB_OVERWRITE;
+import static org.apache.hadoop.fs.azurebfs.services.AbfsErrors.ERR_FILE_ALREADY_EXISTS;
 
 /**
  * AbfsClient interacting with the DFS Endpoint.
@@ -615,9 +616,12 @@ public class AbfsDfsClient extends AbfsClient {
         throw e;
       }
 
+      // ref: HADOOP-19393. Write permission checks can occur before validating
+      // rename operation's validity. If there is an existing destination path, it may be rejected
+      // with an authorization error. Catching and throwing FileAlreadyExistsException instead.
       if(op.getResult().getStorageErrorCode()
           .equals(UNAUTHORIZED_BLOB_OVERWRITE.getErrorCode())){
-        throw new FileAlreadyExistsException("File already exists.");
+        throw new FileAlreadyExistsException(ERR_FILE_ALREADY_EXISTS);
       }
 
       // ref: HADOOP-18242. Rename failure occurring due to a rare case of

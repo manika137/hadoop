@@ -53,6 +53,7 @@ import org.apache.hadoop.security.AccessControlException;
 
 import static org.apache.hadoop.fs.azurebfs.constants.ConfigurationKeys.FS_AZURE_SAS_TOKEN_PROVIDER_TYPE;
 import static org.apache.hadoop.fs.azurebfs.contracts.services.AzureServiceErrorCode.AUTHORIZATION_PERMISSION_MISS_MATCH;
+import static org.apache.hadoop.fs.azurebfs.services.AbfsErrors.ERR_FILE_ALREADY_EXISTS;
 import static org.apache.hadoop.fs.azurebfs.utils.AclTestHelpers.aclEntry;
 import static org.apache.hadoop.fs.contract.ContractTestUtils.assertPathDoesNotExist;
 import static org.apache.hadoop.fs.contract.ContractTestUtils.assertPathExists;
@@ -223,13 +224,7 @@ public class ITestAzureBlobFileSystemDelegationSAS extends AbstractAbfsIntegrati
     touch(src);
     touch(dest);
 
-    try {
-      fs.rename(src, dest);
-      Assertions.fail("Exception expected on rename overwrites.");
-    } catch (FileAlreadyExistsException e) {
-      Assertions.assertThat(e)
-          .isInstanceOf(FileAlreadyExistsException.class);
-    }
+    intercept(FileAlreadyExistsException.class, ERR_FILE_ALREADY_EXISTS, () -> fs.rename(src, dest));
   }
 
   @Test
