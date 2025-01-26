@@ -619,7 +619,7 @@ public class AbfsDfsClient extends AbfsClient {
       // ref: HADOOP-19393. Write permission checks can occur before validating
       // rename operation's validity. If there is an existing destination path, it may be rejected
       // with an authorization error. Catching and throwing FileAlreadyExistsException instead.
-      if(op.getResult().getStorageErrorCode()
+      if (op.getResult().getStorageErrorCode()
           .equals(UNAUTHORIZED_BLOB_OVERWRITE.getErrorCode())){
         throw new FileAlreadyExistsException(ERR_FILE_ALREADY_EXISTS);
       }
